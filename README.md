@@ -15,8 +15,12 @@ Provide seamless **copy → deasciify → paste** automation so selections in No
 
 ## Requirements
 
-- **Python** 3.10+
+- **Python** 3.11+ (matches [`requires-python`](pyproject.toml); `turkish-deasciifier` from Git targets 3.11+)
 - **OS:** Windows (system tray, global hooks, clipboard)
+
+## How to run (development)
+
+With Python 3.11+ installed: `pip install -e .`, then `python -m trcharany` (or the `trcharany` console script after install).
 
 ## Project architecture (Step 1)
 
