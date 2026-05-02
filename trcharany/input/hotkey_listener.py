@@ -38,7 +38,11 @@ class HotkeyListener:
         if self._remove_hotkey is not None:
             return
         try:
-            self._remove_hotkey = keyboard.add_hotkey(self._hotkey, self._callback)
+            self._remove_hotkey = keyboard.add_hotkey(
+                self._hotkey,
+                self._callback,
+                suppress=True,
+            )
             logger.info("Hotkey registered: %s", self._hotkey)
         except Exception:
             logger.exception("Failed to register hotkey")

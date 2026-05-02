@@ -59,7 +59,7 @@ def load_tray_image() -> Image.Image:
 def build_tray_icon(
     on_exit: Callable[[], None],
 ) -> pystray.Icon:
-    state: dict[str, str] = {"status": "Idle — select text, press hotkey"}
+    state: dict[str, str] = {"status": "Idle — select text, press Ctrl+Shift+T"}
 
     def status_text(_: object) -> str:
         return f"Status: {state['status']}"

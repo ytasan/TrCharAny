@@ -8,8 +8,8 @@ Provide seamless **copy → deasciify → paste** automation so selections in No
 
 ## Core workflow
 
-1. User selects text in any app.
-2. User presses the global hotkey (default: **Ctrl+Alt+T**).
+1. User **selects** the text in any app (required — the caret alone is not enough in classic Notepad).
+2. User presses the global hotkey (default: **Ctrl+Shift+T**; avoids **Ctrl+Alt** clashing with **AltGr** on Turkish keyboards).
 3. The app runs: **Ctrl+C** → process clipboard → **Ctrl+V** using a Turkish deasciifier.
 4. Edge cases to handle: empty selection, non-text clipboard content, and windows that restrict automation.
 
@@ -41,7 +41,7 @@ TrCharAny/
 
 - **deasciifier_service.py** — single place for `turkish-deasciifier` (or equivalent); testable without UI.
 - **clipboard_ops.py** — robust clipboard read/write and “is this text?” checks.
-- **hotkeys.py** — registers **Ctrl+Alt+T** (configurable) and invokes the service + clipboard pipeline with minimal latency.
+- **hotkeys.py** — registers **Ctrl+Shift+T** (configurable via `TRCHARANY_HOTKEY`) and invokes the service + clipboard pipeline with minimal latency.
 - **tray_app.py** — runs the tray loop, menu (**Exit**, **Status**), and hosts or signals the hotkey thread.
 - **main.py** — starts tray, starts hotkey listener, clean shutdown.
 
