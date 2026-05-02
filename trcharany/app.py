@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+import signal
+import threading
 
 import pystray
 
@@ -21,6 +23,8 @@ class Application:
         self._pipeline = ClipboardPipeline(self._service)
         self._listener = HotkeyListener(self._pipeline, on_result=self._on_hotkey_result)
         self._icon: pystray.Icon | None = None
+        self._shutdown_lock = threading.Lock()
+        self._shutdown_started = False
 
     def _on_hotkey_result(self, status: str) -> None:
         icon = self._icon
@@ -30,15 +34,31 @@ class Application:
                 setter(status)
 
     def _quit(self) -> None:
+        with self._shutdown_lock:
+            if self._shutdown_started:
+                return
+            self._shutdown_started = True
         logger.info("Exiting")
-        self._listener.stop()
-        if self._icon is not None:
-            self._icon.stop()
+        try:
+            self._listener.stop()
+        except Exception:
+            logger.exception("Error stopping hotkey listener")
+        try:
+            if self._icon is not None:
+                self._icon.stop()
+        except Exception:
+            logger.exception("Error stopping tray icon")
+
+    def _on_sigint(self, _signum: int, _frame: object | None) -> None:
+        """Run shutdown off the signal stack so pystray Win32 callbacks stay clean."""
+        logger.info("Ctrl+C (SIGINT); stopping...")
+        threading.Thread(target=self._quit, name="trcharany-sigint-shutdown", daemon=True).start()
 
     def run(self) -> None:
         self._icon = build_tray_icon(on_exit=self._quit)
         self._listener.start()
         logger.info("TrCharAny started; hotkey %s", config.DEFAULT_HOTKEY)
+        signal.signal(signal.SIGINT, self._on_sigint)
         self._icon.run()
 
 
