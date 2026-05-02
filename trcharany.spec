@@ -12,6 +12,7 @@ a = Analysis(
         "win32con",
         "win32gui",
         "pywintypes",
+        "trcharany.win_console",
         "turkish",
         "turkish.deasciifier",
     ],

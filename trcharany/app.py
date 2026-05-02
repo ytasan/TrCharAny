@@ -11,6 +11,7 @@ from trcharany.automation.clipboard_pipeline import ClipboardPipeline
 from trcharany.input.hotkey_listener import HotkeyListener
 from trcharany.services.deasciifier_service import DeasciifierService
 from trcharany.ui.tray import build_tray_icon
+from trcharany.win_console import install_console_ctrl_handler
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,8 @@ class Application:
         self._icon = build_tray_icon(on_exit=self._quit)
         self._listener.start()
         logger.info("TrCharAny started; hotkey %s", config.DEFAULT_HOTKEY)
-        signal.signal(signal.SIGINT, self._on_sigint)
+        if not install_console_ctrl_handler(self):
+            signal.signal(signal.SIGINT, self._on_sigint)
         self._icon.run()
 
 
