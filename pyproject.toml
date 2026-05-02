@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trcharany"
+version = "0.1.0"
+description = "Windows tray utility: convert ASCII Turkish to proper diacritics via global hotkey"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "keyboard>=0.13.5",
+    "pywin32>=306",
+    "pystray>=0.19.5",
+    "Pillow>=10.0.0",
+    "turkish-deasciifier @ git+https://github.com/emres/turkish-deasciifier.git",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pyinstaller>=6.0.0",
+]
+
+[project.scripts]
+trcharany = "trcharany.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trcharany*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
