@@ -18,36 +18,50 @@ Provide seamless **copy → deasciify → paste** automation so selections in No
 - **Python** 3.11+ (matches [`requires-python`](pyproject.toml); `turkish-deasciifier` from Git targets 3.11+)
 - **OS:** Windows (system tray, global hooks, clipboard)
 
-## How to run (development)
+## How to run
 
-With Python 3.11+ installed: `pip install -e .`, then `python -m trcharany` (or the `trcharany` console script after install).
+- **Development:** With Python 3.11+ installed: `pip install -e .`, then `python -m trcharany` (or the `trcharany` console script after install). For builds, install dev extras: `pip install -e ".[dev]"`.
+- **Built executable:** From the repo root, `pyinstaller trcharany.spec` produces `dist\TrCharAny.exe` (no Python needed on the target machine).
 
-## Project architecture (Step 1)
+## Project layout
 
-Modular layout so core logic, input, clipboard, and UI stay separated:
+Modular layout so services, input, automation, and UI stay separated:
 
 ```
 TrCharAny/
 ├── README.md
-├── pyproject.toml          # or requirements.txt
-├── src/
-│   └── trcharany/
+├── pyproject.toml
+├── trcharany.spec           # PyInstaller one-file build
+├── trcharany/
+│   ├── __init__.py
+│   ├── __main__.py          # entry: python -m trcharany
+│   ├── app.py               # wires tray, hotkey, and shutdown
+│   ├── config.py            # defaults; hotkey via TRCHARANY_HOTKEY env
+│   ├── win_console.py
+│   ├── automation/
+│   │   ├── __init__.py
+│   │   └── clipboard_pipeline.py
+│   ├── input/
+│   │   ├── __init__.py
+│   │   └── hotkey_listener.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   └── deasciifier_service.py
+│   └── ui/
 │       ├── __init__.py
-│       ├── main.py         # entry: wire hotkey + tray + service
-│       ├── deasciifier_service.py   # Step 2: wraps conversion API
-│       ├── clipboard_ops.py         # copy/paste + text extraction (pyperclip / pywin32)
-│       ├── hotkeys.py               # Step 3: global listener (keyboard)
-│       └── tray_app.py              # Step 4: pystray icon, Exit, Status
+│       └── tray.py
 ├── assets/
-│   └── icon.png            # tray icon (Pillow-compatible)
-└── tests/                  # optional
+│   └── icon.png
+└── tests/
+    ├── __init__.py
+    └── test_deasciifier_service.py
 ```
 
-- **deasciifier_service.py** — single place for `turkish-deasciifier` (or equivalent); testable without UI.
-- **clipboard_ops.py** — robust clipboard read/write and “is this text?” checks.
-- **hotkeys.py** — registers **Ctrl+Shift+T** (configurable via `TRCHARANY_HOTKEY`) and invokes the service + clipboard pipeline with minimal latency.
-- **tray_app.py** — runs the tray loop, menu (**Exit**, **Status**), and hosts or signals the hotkey thread.
-- **main.py** — starts tray, starts hotkey listener, clean shutdown.
+- **services/deasciifier_service.py** — wraps `turkish-deasciifier`; testable without UI.
+- **automation/clipboard_pipeline.py** — clipboard read/write and the copy → deasciify → paste path (pywin32).
+- **input/hotkey_listener.py** — global listener (**Ctrl+Shift+T** by default, override with `TRCHARANY_HOTKEY`).
+- **ui/tray.py** — system tray icon and menu.
+- **app.py** / **__main__.py** — application entry and lifecycle.
 
 ## Dependencies
 
