@@ -6,6 +6,10 @@ A lightweight Windows background utility that converts ASCII-Turkish text to pro
 
 Provide seamless **copy → deasciify → paste** automation so selections in Notepad, browsers, and other apps are fixed without leaving the focused window.
 
+## Inspiration
+
+The behavior and purpose mirror **[deasciifier.com](https://deasciifier.com/)** (Turkish ASCII → proper Turkish characters). This work was shaped using that site as the reference example; here the same idea runs locally via a global hotkey instead of a browser workflow.
+
 ## Core workflow
 
 1. User **selects** the text in any app (required — the caret alone is not enough in classic Notepad).
