@@ -9,7 +9,7 @@ Provide seamless **copy → deasciify → paste** automation so selections in No
 ## Core workflow
 
 1. User **selects** the text in any app (required — the caret alone is not enough in classic Notepad).
-2. User presses the global hotkey (default: **Ctrl+Shift+T**; avoids **Ctrl+Alt** clashing with **AltGr** on Turkish keyboards).
+2. User presses the global hotkey (**Ctrl+Alt+G**).
 3. The app runs: **Ctrl+C** → process clipboard → **Ctrl+V** using a Turkish deasciifier.
 4. Edge cases to handle: empty selection, non-text clipboard content, and windows that restrict automation.
 
@@ -80,7 +80,7 @@ TrCharAny/
 │   ├── __init__.py
 │   ├── __main__.py          # entry: python -m trcharany
 │   ├── app.py               # wires tray, hotkey, and shutdown
-│   ├── config.py            # defaults; hotkey via TRCHARANY_HOTKEY env
+│   ├── config.py            # defaults (global hotkey Ctrl+Alt+G)
 │   ├── win_console.py
 │   ├── automation/
 │   │   ├── __init__.py
@@ -103,7 +103,7 @@ TrCharAny/
 
 - **services/deasciifier_service.py** — wraps `turkish-deasciifier`; testable without UI.
 - **automation/clipboard_pipeline.py** — clipboard read/write and the copy → deasciify → paste path (pywin32).
-- **input/hotkey_listener.py** — global listener (**Ctrl+Shift+T** by default, override with `TRCHARANY_HOTKEY`).
+- **input/hotkey_listener.py** — global listener (**Ctrl+Alt+G**).
 - **ui/tray.py** — system tray icon and menu.
 - **app.py** / **__main__.py** — application entry and lifecycle.
 
