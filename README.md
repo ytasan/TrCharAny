@@ -20,8 +20,49 @@ Provide seamless **copy → deasciify → paste** automation so selections in No
 
 ## How to run
 
-- **Development:** With Python 3.11+ installed: `pip install -e .`, then `python -m trcharany` (or the `trcharany` console script after install). For builds, install dev extras: `pip install -e ".[dev]"`.
-- **Built executable:** From the repo root, `pyinstaller trcharany.spec` produces `dist\TrCharAny.exe` (no Python needed on the target machine).
+### Development (recommended: virtual environment)
+
+Use a **venv** in the repo root so dependencies install under your user folder and `python -m trcharany` uses the same interpreter that has `pystray`, `keyboard`, etc. (A global `pip install -e .` on Windows can fail with **permission denied** on `pywin32`, or you may run `python` from a different install and get **ModuleNotFoundError**.)
+
+1. Open a terminal at the **repository root** (the folder that contains `pyproject.toml`).
+
+2. Create and use a venv (Python 3.11+):
+
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+   If PowerShell blocks the activation script, run once (current user only):  
+   `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+   **Without** activating the venv, you can still run the app with the venv’s interpreter explicitly:
+
+   ```powershell
+   .\.venv\Scripts\python.exe -m trcharany
+   ```
+
+3. Install the project in editable mode:
+
+   ```powershell
+   pip install -e .
+   ```
+
+   Optional (tests, tooling): `pip install -e ".[dev]"`
+
+4. Start the app (tray icon + global hotkey). With the venv **activated**:
+
+   ```powershell
+   python -m trcharany
+   ```
+
+   Or use the installed console script: `trcharany`
+
+5. In **VS Code / Cursor**, choose **Python: Select Interpreter** and pick `.venv\Scripts\python.exe` so integrated terminals use the venv by default.
+
+### Built executable
+
+From the repo root (with build deps installed, e.g. dev extras), `pyinstaller trcharany.spec` produces `dist\TrCharAny.exe` (no Python needed on the target machine).
 
 ## Project layout
 
