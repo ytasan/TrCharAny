@@ -26,37 +26,39 @@ Use a **venv** in the repo root so dependencies install under your user folder a
 
 1. Open a terminal at the **repository root** (the folder that contains `pyproject.toml`).
 
-2. Create and use a venv (Python 3.11+):
+2. Create a venv (Python 3.11+). You only need this **once** unless you delete `.venv`:
 
    ```powershell
    python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
    ```
 
-   If PowerShell blocks the activation script, run once (current user only):  
-   `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+   You do **not** have to run `Activate.ps1` if you start the app via the venv’s `python.exe` (below), [`run.bat`](run.bat), or the IDE interpreter — that avoids both **execution policy** issues and some **antivirus** false positives on `Activate.ps1`.
 
-   **Without** activating the venv, you can still run the app with the venv’s interpreter explicitly:
+   Optional — activate the venv in the current shell (then `python` points at `.venv`):
+
+   - PowerShell: `.\.venv\Scripts\Activate.ps1`  
+     If scripts are blocked: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (current user only).
+   - Command Prompt: `.\.venv\Scripts\activate.bat` (often not flagged like `Activate.ps1`.)
+
+   **Antivirus** may report `ScriptContainedMaliciousContent` or similar for `Activate.ps1`. Prefer: `.\.venv\Scripts\python.exe -m trcharany`, or from repo root run **`run.bat`** (double-click or `.\run.bat` in PowerShell).
+
+3. Install the project in editable mode (use venv’s **pip** if you did not activate the shell):
+
+   ```powershell
+   .\.venv\Scripts\pip.exe install -e .
+   ```
+
+   If the venv is already activated: `pip install -e .`
+
+   Optional (tests, tooling): `pip install -e ".[dev]"` (same `pip` / `.\.venv\Scripts\pip.exe` rule).
+
+4. Start the app (tray icon + global hotkey):
 
    ```powershell
    .\.venv\Scripts\python.exe -m trcharany
    ```
 
-3. Install the project in editable mode:
-
-   ```powershell
-   pip install -e .
-   ```
-
-   Optional (tests, tooling): `pip install -e ".[dev]"`
-
-4. Start the app (tray icon + global hotkey). With the venv **activated**:
-
-   ```powershell
-   python -m trcharany
-   ```
-
-   Or use the installed console script: `trcharany`
+   Or run [`run.bat`](run.bat) from the repo root. If the venv shell is **activated**, `python -m trcharany` or the `trcharany` console script also works.
 
 5. In **VS Code / Cursor**, choose **Python: Select Interpreter** and pick `.venv\Scripts\python.exe` so integrated terminals use the venv by default.
 
@@ -71,6 +73,7 @@ Modular layout so services, input, automation, and UI stay separated:
 ```
 TrCharAny/
 ├── README.md
+├── run.bat                  # optional: starts app via .venv without Activate.ps1
 ├── pyproject.toml
 ├── trcharany.spec           # PyInstaller one-file build
 ├── trcharany/
