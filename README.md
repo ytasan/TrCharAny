@@ -13,7 +13,7 @@ The behavior and purpose mirror **[deasciifier.com](https://deasciifier.com/)** 
 ## Core workflow
 
 1. User **selects** the text in any app (required — the caret alone is not enough in classic Notepad).
-2. User presses the global hotkey (default: **Ctrl+Shift+T**; avoids **Ctrl+Alt** clashing with **AltGr** on Turkish keyboards).
+2. User presses the global hotkey (**Ctrl+Alt+G**).
 3. The app runs: **Ctrl+C** → process clipboard → **Ctrl+V** using a Turkish deasciifier.
 4. Edge cases to handle: empty selection, non-text clipboard content, and windows that restrict automation.
 
@@ -24,8 +24,51 @@ The behavior and purpose mirror **[deasciifier.com](https://deasciifier.com/)** 
 
 ## How to run
 
-- **Development:** With Python 3.11+ installed: `pip install -e .`, then `python -m trcharany` (or the `trcharany` console script after install). For builds, install dev extras: `pip install -e ".[dev]"`.
-- **Built executable:** From the repo root, `pyinstaller trcharany.spec` produces `dist\TrCharAny.exe` (no Python needed on the target machine).
+### Development (recommended: virtual environment)
+
+Use a **venv** in the repo root so dependencies install under your user folder and `python -m trcharany` uses the same interpreter that has `pystray`, `keyboard`, etc. (A global `pip install -e .` on Windows can fail with **permission denied** on `pywin32`, or you may run `python` from a different install and get **ModuleNotFoundError**.)
+
+1. Open a terminal at the **repository root** (the folder that contains `pyproject.toml`).
+
+2. Create a venv (Python 3.11+). You only need this **once** unless you delete `.venv`:
+
+   ```powershell
+   python -m venv .venv
+   ```
+
+   You do **not** have to run `Activate.ps1` if you start the app via the venv’s `python.exe` (below), [`run.bat`](run.bat), or the IDE interpreter — that avoids both **execution policy** issues and some **antivirus** false positives on `Activate.ps1`.
+
+   Optional — activate the venv in the current shell (then `python` points at `.venv`):
+
+   - PowerShell: `.\.venv\Scripts\Activate.ps1`  
+     If scripts are blocked: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (current user only).
+   - Command Prompt: `.\.venv\Scripts\activate.bat` (often not flagged like `Activate.ps1`.)
+
+   **Antivirus** may report `ScriptContainedMaliciousContent` or similar for `Activate.ps1`. Prefer: `.\.venv\Scripts\python.exe -m trcharany`, or from repo root run **`run.bat`** (double-click or `.\run.bat` in PowerShell).
+
+3. Install the project in editable mode (use venv’s **pip** if you did not activate the shell):
+
+   ```powershell
+   .\.venv\Scripts\pip.exe install -e .
+   ```
+
+   If the venv is already activated: `pip install -e .`
+
+   Optional (tests, tooling): `pip install -e ".[dev]"` (same `pip` / `.\.venv\Scripts\pip.exe` rule).
+
+4. Start the app (tray icon + global hotkey):
+
+   ```powershell
+   .\.venv\Scripts\python.exe -m trcharany
+   ```
+
+   Or run [`run.bat`](run.bat) from the repo root. If the venv shell is **activated**, `python -m trcharany` or the `trcharany` console script also works.
+
+5. In **VS Code / Cursor**, choose **Python: Select Interpreter** and pick `.venv\Scripts\python.exe` so integrated terminals use the venv by default.
+
+### Built executable
+
+From the repo root (with build deps installed, e.g. dev extras), `pyinstaller trcharany.spec` produces `dist\TrCharAny.exe` (no Python needed on the target machine).
 
 ## Project layout
 
@@ -34,13 +77,14 @@ Modular layout so services, input, automation, and UI stay separated:
 ```
 TrCharAny/
 ├── README.md
+├── run.bat                  # optional: starts app via .venv without Activate.ps1
 ├── pyproject.toml
 ├── trcharany.spec           # PyInstaller one-file build
 ├── trcharany/
 │   ├── __init__.py
 │   ├── __main__.py          # entry: python -m trcharany
 │   ├── app.py               # wires tray, hotkey, and shutdown
-│   ├── config.py            # defaults; hotkey via TRCHARANY_HOTKEY env
+│   ├── config.py            # defaults (global hotkey Ctrl+Alt+G)
 │   ├── win_console.py
 │   ├── automation/
 │   │   ├── __init__.py
@@ -63,7 +107,7 @@ TrCharAny/
 
 - **services/deasciifier_service.py** — wraps `turkish-deasciifier`; testable without UI.
 - **automation/clipboard_pipeline.py** — clipboard read/write and the copy → deasciify → paste path (pywin32).
-- **input/hotkey_listener.py** — global listener (**Ctrl+Shift+T** by default, override with `TRCHARANY_HOTKEY`).
+- **input/hotkey_listener.py** — global listener (**Ctrl+Alt+G**).
 - **ui/tray.py** — system tray icon and menu.
 - **app.py** / **__main__.py** — application entry and lifecycle.
 

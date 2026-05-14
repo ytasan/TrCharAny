@@ -18,11 +18,10 @@ class HotkeyListener:
     def __init__(
         self,
         pipeline: ClipboardPipeline,
-        hotkey: str | None = None,
         on_result: Callable[[str], None] | None = None,
     ) -> None:
         self._pipeline = pipeline
-        self._hotkey = hotkey or config.DEFAULT_HOTKEY
+        self._hotkey = config.DEFAULT_HOTKEY
         self._on_result = on_result
         self._remove_hotkey: Callable[[], None] | None = None
 
