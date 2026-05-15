@@ -66,6 +66,25 @@ Use a **venv** in the repo root so dependencies install under your user folder a
 
 5. In **VS Code / Cursor**, choose **Python: Select Interpreter** and pick `.venv\Scripts\python.exe` so integrated terminals use the venv by default.
 
+### Background launch (`run.bat`) and Windows startup
+
+- **[`run.bat`](run.bat)** starts TrCharAny with **`.venv\Scripts\pythonw.exe`** (GUI interpreter, **no console window**). It uses `start` so the batch exits immediately.
+- **First-time setup:** `run.bat` requires a working `.venv` with `pythonw.exe` and an editable install (`pip install -e .`). If the venv is missing, the batch prints steps and pauses.
+- **Run at sign-in:** Running `run.bat` once does **not** enable auto-start. Create a shortcut: **Win+R** → `shell:startup` → **New → Shortcut** → target the full path to `run.bat` (e.g. `C:\Users\…\TrCharAny\run.bat`).
+- **Tray icon:** Look next to the clock. On **Windows 11**, new icons may sit under **^** (hidden icons); open that area or drag the icon to the visible tray. **Exit:** right-click the tray icon → **Exit**.
+- **Task Manager:** The process often appears as **Python** / **`pythonw.exe`** with a command line containing `-m trcharany`. The packaged **`TrCharAny.exe`** shows that name in the **Name** column instead.
+- **Windows identity:** At startup the app sets an explicit **App User Model ID** (`trcharany/win_shell.py`) so the shell can group and label TrCharAny more consistently than a generic Python run.
+
+### Troubleshooting
+
+- **`Permission denied` when running `python -m venv .venv`:** Usually the old `.venv` is in use (TrCharAny, another terminal, or the IDE). Quit the app, close terminals using that venv, then either run **`.\.venv\Scripts\pip install -e .`** if the venv is already fine, or remove and recreate:
+  ```powershell
+  Remove-Item -Recurse -Force .venv
+  python -m venv .venv
+  .\.venv\Scripts\pip install -e .
+  ```
+- **`pythonw.exe` missing but `python.exe` exists in `.venv\Scripts`:** Remove `.venv` and recreate as above.
+
 ### Built executable
 
 From the repo root (with build deps installed, e.g. dev extras), `pyinstaller trcharany.spec` produces `dist\TrCharAny.exe` (no Python needed on the target machine).
@@ -77,7 +96,7 @@ Modular layout so services, input, automation, and UI stay separated:
 ```
 TrCharAny/
 ├── README.md
-├── run.bat                  # optional: starts app via .venv without Activate.ps1
+├── run.bat                  # starts via pythonw: no console; needs .venv + pip install -e .
 ├── pyproject.toml
 ├── trcharany.spec           # PyInstaller one-file build
 ├── trcharany/
@@ -85,7 +104,8 @@ TrCharAny/
 │   ├── __main__.py          # entry: python -m trcharany
 │   ├── app.py               # wires tray, hotkey, and shutdown
 │   ├── config.py            # defaults (global hotkey Ctrl+Alt+G)
-│   ├── win_console.py
+│   ├── win_console.py       # Ctrl+C / console-close on console runs (Windows)
+│   ├── win_shell.py         # App User Model ID for taskbar/shell (Windows)
 │   ├── automation/
 │   │   ├── __init__.py
 │   │   └── clipboard_pipeline.py
@@ -110,6 +130,7 @@ TrCharAny/
 - **input/hotkey_listener.py** — global listener (**Ctrl+Alt+G**).
 - **ui/tray.py** — system tray icon and menu.
 - **app.py** / **__main__.py** — application entry and lifecycle.
+- **win_shell.py** — Windows **App User Model ID** registration at launch.
 
 ## Dependencies
 
