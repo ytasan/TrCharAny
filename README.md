@@ -119,7 +119,8 @@ TrCharAny/
 │       ├── __init__.py
 │       └── tray.py
 ├── assets/
-│   └── icon.png
+│   ├── trcharany-logo-concept.png  # tray icon (primary)
+│   └── icon.png                     # generated fallback if the concept asset is missing
 └── tests/
     ├── __init__.py
     └── test_deasciifier_service.py
@@ -150,7 +151,7 @@ Install these for development (versions can be pinned in `pyproject.toml` / `req
 ## Packaging (Step 5 outline)
 
 - Prefer **PyInstaller** (`pyinstaller --onefile --windowed ...`) so users get a single `.exe`.
-- Bundle `assets/icon.png` and declare hidden imports if hooks fail (`keyboard`, `pystray`).
+- Bundle `assets/` (includes the tray PNG) and declare hidden imports if hooks fail (`keyboard`, `pystray`).
 - Test on a clean Windows VM without Python installed.
 
 ## Roadmap (Plan Mode)

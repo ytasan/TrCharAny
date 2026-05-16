@@ -11,7 +11,9 @@ from PIL import Image, ImageDraw, ImageFont
 logger = logging.getLogger(__name__)
 
 _ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "assets"
-_DEFAULT_ICON_PATH = _ASSETS_DIR / "icon.png"
+_TRAY_ICON_PATH = _ASSETS_DIR / "trcharany-logo-concept.png"
+# Written only when the tray asset is missing or unreadable (never overwrites concept PNG).
+_FALLBACK_GENERATED_ICON_PATH = _ASSETS_DIR / "icon.png"
 
 
 def _make_default_icon(size: int = 64) -> Image.Image:
@@ -41,7 +43,7 @@ def _make_default_icon(size: int = 64) -> Image.Image:
 
 
 def load_tray_image() -> Image.Image:
-    path = _DEFAULT_ICON_PATH
+    path = _TRAY_ICON_PATH
     if path.is_file():
         try:
             return Image.open(path).convert("RGBA")
@@ -50,9 +52,11 @@ def load_tray_image() -> Image.Image:
     _ASSETS_DIR.mkdir(parents=True, exist_ok=True)
     img = _make_default_icon()
     try:
-        img.save(_DEFAULT_ICON_PATH, format="PNG")
+        img.save(_FALLBACK_GENERATED_ICON_PATH, format="PNG")
     except OSError:
-        logger.debug("Could not write default icon to %s", _DEFAULT_ICON_PATH)
+        logger.debug(
+            "Could not write fallback icon to %s", _FALLBACK_GENERATED_ICON_PATH
+        )
     return img
 
 
