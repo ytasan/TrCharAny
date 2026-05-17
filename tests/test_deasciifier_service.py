@@ -14,3 +14,10 @@ def test_deasciifier_ascii_turkish() -> None:
     raw = "Opusmegi cagristiran catirtilar."
     out = s.deasciify(raw)
     assert "ç" in out or "ğ" in out or "ı" in out or "ş" in out or out != raw
+
+
+def test_deasciifier_yasin_exception_preserves_spelling() -> None:
+    s = DeasciifierService()
+    assert s.deasciify("yasin") == "yasin"
+    assert s.deasciify("Yasin") == "Yasin"
+    assert "yasin" in s.deasciify("Merhaba yasin nasilsin")

@@ -15,4 +15,17 @@ CLIPBOARD_PASTE_DELAY = float(os.environ.get("TRCHARANY_PASTE_DELAY", "0.03"))
 
 LOG_LEVEL = getattr(logging, os.environ.get("TRCHARANY_LOG_LEVEL", "INFO").upper(), logging.INFO)
 
+# ASCII whole words passed through deasciification unchanged (lowercased for matching).
+_DEFAULT_DEASCII_EXCEPTION_WORDS: tuple[str, ...] = ("yasin",)
+
+
+def deascii_exception_words() -> frozenset[str]:
+    """Built-in exceptions plus optional TRCHARANY_DEASCII_EXCEPTIONS (comma-separated)."""
+    words = {w.lower() for w in _DEFAULT_DEASCII_EXCEPTION_WORDS}
+    extra = os.environ.get("TRCHARANY_DEASCII_EXCEPTIONS", "")
+    for part in extra.split(","):
+        p = part.strip()
+        if p:
+            words.add(p.lower())
+    return frozenset(words)
 
